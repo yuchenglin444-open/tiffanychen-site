@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:tiffanychen.site)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)",
+      "Bash(gh auth status)",
+      "Bash(git add -A)",
+      "Bash(git commit -m \"Initial Next.js scaffold with TypeScript, Tailwind CSS, App Router\")"
+    ]
+  }
+}
