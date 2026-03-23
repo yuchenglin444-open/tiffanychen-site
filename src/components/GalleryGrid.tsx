@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Artwork } from "@/types";
 import { useLanguage } from "./LanguageProvider";
 import ArtworkCard from "./ArtworkCard";
@@ -11,8 +11,26 @@ interface GalleryGridProps {
 }
 
 export default function GalleryGrid({ artworks }: GalleryGridProps) {
-  const [selected, setSelected] = useState<Artwork | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const { locale } = useLanguage();
+
+  const selected = selectedIndex !== null ? artworks[selectedIndex] : null;
+
+  const handleSelect = useCallback(
+    (artwork: Artwork) => {
+      const index = artworks.findIndex((a) => a.slug === artwork.slug);
+      setSelectedIndex(index >= 0 ? index : null);
+    },
+    [artworks]
+  );
+
+  const handlePrev = selectedIndex !== null && selectedIndex > 0
+    ? () => setSelectedIndex(selectedIndex - 1)
+    : null;
+
+  const handleNext = selectedIndex !== null && selectedIndex < artworks.length - 1
+    ? () => setSelectedIndex(selectedIndex + 1)
+    : null;
 
   return (
     <>
@@ -21,7 +39,7 @@ export default function GalleryGrid({ artworks }: GalleryGridProps) {
           <ArtworkCard
             key={artwork.slug}
             artwork={artwork}
-            onSelect={setSelected}
+            onSelect={handleSelect}
           />
         ))}
       </div>
@@ -29,7 +47,9 @@ export default function GalleryGrid({ artworks }: GalleryGridProps) {
         <Lightbox
           src={selected.image}
           alt={locale === "zh" ? selected.titleZh : selected.title}
-          onClose={() => setSelected(null)}
+          onClose={() => setSelectedIndex(null)}
+          onPrev={handlePrev}
+          onNext={handleNext}
         />
       )}
     </>

@@ -7,14 +7,18 @@ interface LightboxProps {
   src: string;
   alt: string;
   onClose: () => void;
+  onPrev: (() => void) | null;
+  onNext: (() => void) | null;
 }
 
-export default function Lightbox({ src, alt, onClose }: LightboxProps) {
+export default function Lightbox({ src, alt, onClose, onPrev, onNext }: LightboxProps) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft" && onPrev) onPrev();
+      if (e.key === "ArrowRight" && onNext) onNext();
     },
-    [onClose]
+    [onClose, onPrev, onNext]
   );
 
   useEffect(() => {
@@ -31,9 +35,10 @@ export default function Lightbox({ src, alt, onClose }: LightboxProps) {
       className="fixed inset-0 z-[60] flex items-center justify-center bg-white/94 backdrop-blur-sm"
       onClick={onClose}
     >
+      {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-6 right-6 text-gray-500 hover:text-gray-900 transition-colors"
+        className="absolute top-6 right-6 text-gray-500 hover:text-gray-900 transition-colors z-10"
         aria-label="Close lightbox"
       >
         <svg
@@ -50,8 +55,62 @@ export default function Lightbox({ src, alt, onClose }: LightboxProps) {
           />
         </svg>
       </button>
+
+      {/* Previous arrow */}
+      {onPrev && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onPrev();
+          }}
+          className="fixed left-4 top-1/2 -translate-y-1/2 z-10 p-3 text-gray-400 hover:text-gray-900 transition-colors"
+          aria-label="Previous artwork"
+        >
+          <svg
+            className="h-10 w-10"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1}
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 19.5 8.25 12l7.5-7.5"
+            />
+          </svg>
+        </button>
+      )}
+
+      {/* Next arrow */}
+      {onNext && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onNext();
+          }}
+          className="fixed right-4 top-1/2 -translate-y-1/2 z-10 p-3 text-gray-400 hover:text-gray-900 transition-colors"
+          aria-label="Next artwork"
+        >
+          <svg
+            className="h-10 w-10"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1}
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m8.25 4.5 7.5 7.5-7.5 7.5"
+            />
+          </svg>
+        </button>
+      )}
+
+      {/* Image */}
       <div
-        className="relative max-h-[85vh] max-w-[90vw]"
+        className="relative max-h-[85vh] max-w-[70vw]"
         onClick={(e) => e.stopPropagation()}
       >
         <Image
